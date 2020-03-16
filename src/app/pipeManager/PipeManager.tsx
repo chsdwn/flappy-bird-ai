@@ -11,12 +11,10 @@ export const PipeManager = () => {
   const [pipes, setPipes] = useState<IPipe[]>([]);
 
   let space = 80;
-  let x = 20;
-
   let frameCount = 0;
 
   useEffect(() => {
-    setInterval(draw, 1000 / 60);
+    setInterval(update, 1000 / 60);
   }, []);
 
   const draw = () => {
@@ -24,28 +22,35 @@ export const PipeManager = () => {
       MIN_PIPE_HEIGHT + Math.random() * (HEIGHT - space - MIN_PIPE_HEIGHT * 2);
     const secondPipeHeight = HEIGHT - firtsPipeHeight - space;
 
-    const pipe1: IPipe = {
+    const pipeTop: IPipe = {
       x: WIDTH,
       y: 0,
       width: PIPE_WIDTH,
       height: firtsPipeHeight
     };
-    const pipe2: IPipe = {
+    const pipeBottom: IPipe = {
       x: WIDTH,
       y: firtsPipeHeight + space,
       width: PIPE_WIDTH,
       height: secondPipeHeight
     };
 
-    setPipes((pipes) => [...pipes, pipe1, pipe2]);
-  }
+    setPipes(pipes => [...pipes, pipeTop, pipeBottom]);
+  };
 
   const update = () => {
-    frameCount++;
-    if (frameCount % 30) {
+    setPipes(pipes =>
+      pipes.map(pipe => {
+        pipe.x -= 3 / 2;
+        return pipe;
+      })
+    );
+
+    if (frameCount % 180 === 0 || frameCount === 0) {
       draw();
     }
-  }
+    frameCount++;
+  };
 
   return <div>{pipes.length > 0 && <Pipe pipes={pipes} />}</div>;
 };

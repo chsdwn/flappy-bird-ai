@@ -15,6 +15,7 @@ export const Pipe: React.FC<IProps> = ({ pipes }) => {
   useEffect(() => {
     if (canvas && canvas.current) {
       context = canvas.current.getContext("2d");
+      context?.clearRect(0, 0, 800, 500);
 
       if (context) {
         context.fillStyle = "#000";
@@ -22,8 +23,6 @@ export const Pipe: React.FC<IProps> = ({ pipes }) => {
         pipes.forEach(pipe => {
           context?.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
         });
-
-        console.log(pipes);
       }
     }
   });
