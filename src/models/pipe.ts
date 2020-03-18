@@ -3,4 +3,5 @@ export default interface IPipe {
   y: number;
   width: number;
   height: number;
+  isDead: boolean;
 }

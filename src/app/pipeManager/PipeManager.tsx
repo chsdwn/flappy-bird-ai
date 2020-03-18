@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react";
+
+import { GameField } from "../gameField/GameField";
+
 import IPipe from "../../models/pipe";
-import { Pipe } from "../pipe/Pipe";
 
 export const PipeManager = () => {
   const WIDTH = 800;
   const HEIGHT = 500;
-  const PIPE_WIDTH = 50;
+
+  const PIPE_WIDTH = 80;
   const MIN_PIPE_HEIGHT = 40;
+
+  const TARGET_FPS = 120;
 
   const [pipes, setPipes] = useState<IPipe[]>([]);
 
@@ -14,10 +19,10 @@ export const PipeManager = () => {
   let frameCount = 0;
 
   useEffect(() => {
-    setInterval(update, 1000 / 60);
+    setInterval(run, 1000 / TARGET_FPS);
   }, []);
 
-  const draw = () => {
+  const createPipe = () => {
     const firtsPipeHeight =
       MIN_PIPE_HEIGHT + Math.random() * (HEIGHT - space - MIN_PIPE_HEIGHT * 2);
     const secondPipeHeight = HEIGHT - firtsPipeHeight - space;
@@ -26,31 +31,41 @@ export const PipeManager = () => {
       x: WIDTH,
       y: 0,
       width: PIPE_WIDTH,
-      height: firtsPipeHeight
+      height: firtsPipeHeight,
+      isDead: false
     };
     const pipeBottom: IPipe = {
       x: WIDTH,
       y: firtsPipeHeight + space,
       width: PIPE_WIDTH,
-      height: secondPipeHeight
+      height: secondPipeHeight,
+      isDead: false
     };
 
     setPipes(pipes => [...pipes, pipeTop, pipeBottom]);
   };
 
-  const update = () => {
+  const update = (pipe: IPipe) => {
+    pipe.x -= 1;
+
+    if (pipe.x < 0 - PIPE_WIDTH) {
+      pipe.isDead = true;
+    }
+  };
+
+  const run = () => {
     setPipes(pipes =>
       pipes.map(pipe => {
-        pipe.x -= 3 / 2;
+        update(pipe);
         return pipe;
       })
     );
 
-    if (frameCount % 180 === 0 || frameCount === 0) {
-      draw();
+    if (frameCount % (TARGET_FPS * 3) === 0 || frameCount === 0) {
+      createPipe();
     }
     frameCount++;
   };
 
-  return <div>{pipes.length > 0 && <Pipe pipes={pipes} />}</div>;
+  return <div>{pipes.length > 0 && <GameField pipes={pipes} />}</div>;
 };

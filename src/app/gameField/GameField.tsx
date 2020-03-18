@@ -2,13 +2,13 @@ import React, { useRef, useEffect } from "react";
 
 import IPipe from "../../models/pipe";
 
-import classes from "./Pipe.module.scss";
+import classes from "./GameField.module.scss";
 
 interface IProps {
   pipes: IPipe[];
 }
 
-export const Pipe: React.FC<IProps> = ({ pipes }) => {
+export const GameField: React.FC<IProps> = ({ pipes }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   let context: CanvasRenderingContext2D | null;
 
@@ -20,9 +20,11 @@ export const Pipe: React.FC<IProps> = ({ pipes }) => {
       if (context) {
         context.fillStyle = "#000";
 
-        pipes.forEach(pipe => {
-          context?.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
-        });
+        pipes
+          .filter(pipe => !pipe.isDead)
+          .forEach(pipe => {
+            context?.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
+          });
       }
     }
   });
@@ -32,7 +34,7 @@ export const Pipe: React.FC<IProps> = ({ pipes }) => {
       ref={canvas}
       width={800}
       height={500}
-      className={classes.Pipe}
+      className={classes.GameField}
     ></canvas>
   );
 };
