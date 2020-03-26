@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import { GameField } from "../gameField/GameField";
+import { Pipe } from "../pipe/Pipe";
 
 import IBird from "../../models/bird";
 import IPipe from "../../models/pipe";
+import { Bird } from "../bird/Bird";
 
 export const PipeManager = () => {
   const WIDTH = 800;
@@ -16,12 +18,15 @@ export const PipeManager = () => {
 
   const [pipes, setPipes] = useState<IPipe[]>([]);
   const [bird, setBird] = useState<IBird | null>(null);
-  
+
+  const [topPipeHeight, setTopPipeHeight] = useState(0);
+  const [bottomPipeHeight, setBottomPipeHeight] = useState(0);
+
   let space = 120;
   let frameCount = 0;
 
   let gravity = 0;
-  let velocity = .1;
+  let velocity = 0.1;
 
   useEffect(() => {
     document.addEventListener("keydown", onKeyDown);
@@ -30,40 +35,15 @@ export const PipeManager = () => {
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.code === "Space") {
-      jump();
+      jumpBird();
     }
   };
 
   const createPipe = () => {
-    const firtsPipeHeight =
-      MIN_PIPE_HEIGHT + Math.random() * (HEIGHT - space - MIN_PIPE_HEIGHT * 2);
-    const secondPipeHeight = HEIGHT - firtsPipeHeight - space;
-
-    const pipeTop: IPipe = {
-      x: WIDTH,
-      y: 0,
-      width: PIPE_WIDTH,
-      height: firtsPipeHeight,
-      isDead: false
-    };
-    const pipeBottom: IPipe = {
-      x: WIDTH,
-      y: firtsPipeHeight + space,
-      width: PIPE_WIDTH,
-      height: secondPipeHeight,
-      isDead: false
-    };
-
-    setPipes(pipes => [...pipes, pipeTop, pipeBottom]);
-  };
-
-  const createBird = () => {
-    const bird: IBird = {
-      x: 50,
-      y: 150
-    };
-
-    setBird(bird);
+    setTopPipeHeight(
+      MIN_PIPE_HEIGHT + Math.random() * (HEIGHT - space - MIN_PIPE_HEIGHT * 2)
+    );
+    setBottomPipeHeight(HEIGHT - topPipeHeight - space);
   };
 
   const updatePipes = () => {
@@ -87,15 +67,12 @@ export const PipeManager = () => {
     });
   };
 
-  const jump = () => {
+  const jumpBird = () => {
     gravity = -4;
   };
 
   const run = () => {
     if (frameCount % (TARGET_FPS * 3) === 0 || frameCount === 0) {
-      if (frameCount === 0) {
-        createBird();
-      }
       createPipe();
     }
     frameCount++;
@@ -106,6 +83,15 @@ export const PipeManager = () => {
 
   return (
     <div>
+      <Bird setBird={setBird} />
+      <Pipe
+        topPipeHeight={topPipeHeight}
+        bottomPipeHeight={bottomPipeHeight}
+        PIPE_WIDTH={PIPE_WIDTH}
+        SPACE={space}
+        WIDTH={WIDTH}
+        setPipes={setPipes}
+      />
       {pipes.length > 0 && bird && <GameField pipes={pipes} bird={bird} />}
     </div>
   );
